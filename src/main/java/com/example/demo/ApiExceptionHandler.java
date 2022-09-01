@@ -11,5 +11,6 @@ public class ApiExceptionHandler {
     @ExceptionHandler({CallNotPermittedException.class})
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     public void handle() {
+        System.out.println("CircuitBreaker is OPEN");
     }
 }

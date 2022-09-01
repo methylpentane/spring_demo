@@ -13,7 +13,9 @@ import static io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.Sliding
 public class ExternalApiConfig {
     @Bean
     public WebClient webClient() {
-        return WebClient.create("http://localhost:9090");
+        return WebClient.builder()
+                .baseUrl("http://localhost:9090")
+                .build();
     }
 
     @Bean
