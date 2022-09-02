@@ -14,7 +14,7 @@ public class ExternalApiConfig {
     @Bean
     public WebClient webClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:9090")
+                .baseUrl("http://cf159072-904a-439a-9a28-4d25b2340e7f.mock.pstmn.io")
                 .build();
     }
 

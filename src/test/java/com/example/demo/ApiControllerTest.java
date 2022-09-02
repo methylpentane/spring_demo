@@ -18,15 +18,15 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ApiControllerTest {
-    @RegisterExtension
-    static WireMockExtension EXTERNAL_SERVICE = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().port(9090))
-            .build();
+//    @RegisterExtension
+//    static WireMockExtension EXTERNAL_SERVICE = WireMockExtension.newInstance()
+//            .options(WireMockConfiguration.wireMockConfig().port(9090))
+//            .build();
     @Autowired
     private TestRestTemplate restTemplate;
     @Test
     public void testFoo() throws Exception {
-        EXTERNAL_SERVICE.stubFor(get("/external-foo").willReturn(serverError()));
+//        EXTERNAL_SERVICE.stubFor(get("/external-foo").willReturn(serverError()));
         for (int i = 0; i < 5; i++) {
             ResponseEntity<String> response = restTemplate.getForEntity("/foo", String.class);
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
