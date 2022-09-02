@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import io.github.resilience4j.common.circuitbreaker.configuration.CircuitBreakerConfigCustomizer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -11,10 +12,14 @@ import static io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.Sliding
 
 @Configuration
 public class ExternalApiConfig {
+
+    @Value("${externalApi.baseUrl}")
+    private String baseUrl;
+
     @Bean
     public WebClient webClient() {
         return WebClient.builder()
-                .baseUrl("http://cf159072-904a-439a-9a28-4d25b2340e7f.mock.pstmn.io")
+                .baseUrl(baseUrl)
                 .build();
     }
 
