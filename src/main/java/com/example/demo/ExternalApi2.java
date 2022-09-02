@@ -1,7 +1,8 @@
 package com.example.demo;
 
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -17,17 +18,27 @@ import java.util.Map;
 public class ExternalApi2 {
     private final WebClient webClient;
 
-//    @CircuitBreaker(name = "externalServiceBar")
-    public Mono<String> callExternalApiBar(List<Map> requests) {
-        List<Mono> responses = new ArrayList<Mono>();
-        for (Map req: requests) {
-            String shopId = (String) req.get("shopId");
-            String manageNumber = (String) req.get("managenumber");
-//            System.out.println(shopId + manageNumber);
-            responses.add(webClient.get().uri("/shop").retrieve().bodyToMono(String.class));
+
+
+    //    @CircuitBreaker(name = "externalServiceBar")
+    public Mono<String> callExternalApiBar(JsonNode requestBody) {
+        JsonNode requests = requestBody.get("request");
+        List<Mono<String>> responses = new ArrayList<>();
+        for (JsonNode req: requests) {
+            String shopId = req.get("shopId").textValue();
+            String manageNumber = req.get("manageNumber").textValue();
+//            Mono<String> responseMono = externalApi.callExternalApiFoo(shopId, manageNumber);
+            Mono<String> responseMono = webClient.get().uri("/shop").retrieve().bodyToMono(String.class);
+            responses.add(responseMono);
         }
-        return Flux.concat(responses);
-//        return webClient.get().uri("/shop").retrieve()
-//                .bodyToMono(String.class);
+        return Flux.merge(responses)
+                .collectList()
+                .flatMap(response-> {
+                    String combinedResponse = "";
+                    for (String res : response) {
+                        combinedResponse += res;
+                    }
+                return Mono.just(combinedResponse);
+        });
     }
 }

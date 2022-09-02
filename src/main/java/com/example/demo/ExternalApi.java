@@ -20,9 +20,11 @@ public class ExternalApi {
     private final WebClient webClient;
 
     @CircuitBreaker(name = "externalServiceFoo")
-    public Mono<String> callExternalApiFoo() {
+    public Mono<String> callExternalApiFoo(String shopId, String manageNumber) {
         try {
-            return webClient.get().uri("/external-foo").retrieve()
+            return webClient
+                    .get()
+                    .uri("/external-foo").retrieve()
                     .bodyToMono(String.class)
                     .onErrorResume(Mono::error)
                     .retryWhen(
