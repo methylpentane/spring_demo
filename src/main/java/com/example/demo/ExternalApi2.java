@@ -23,22 +23,29 @@ public class ExternalApi2 {
     //    @CircuitBreaker(name = "externalServiceBar")
     public Mono<String> callExternalApiBar(JsonNode requestBody) {
         JsonNode requests = requestBody.get("request");
-        List<Mono<String>> responses = new ArrayList<>();
-        for (JsonNode req: requests) {
-            String shopId = req.get("shopId").textValue();
-            String manageNumber = req.get("manageNumber").textValue();
-//            Mono<String> responseMono = externalApi.callExternalApiFoo(shopId, manageNumber);
-            Mono<String> responseMono = webClient.get().uri("/shop").retrieve().bodyToMono(String.class);
-            responses.add(responseMono);
-        }
-        return Flux.merge(responses)
+        return Flux.fromIterable(requests)
+                .parallel()
+                .flatMap((req) -> webClient.get().uri("/external-foo").retrieve().bodyToMono(String.class))
+                .sequential()
                 .collectList()
-                .flatMap(response-> {
-                    String combinedResponse = "";
-                    for (String res : response) {
-                        combinedResponse += res;
-                    }
-                return Mono.just(combinedResponse);
-        });
+                .map(List::toString);
+//        JsonNode requests = requestBody.get("request");
+//        List<Mono<String>> responses = new ArrayList<>();
+//        for (JsonNode req: requests) {
+//            String shopId = req.get("shopId").textValue();
+//            String manageNumber = req.get("manageNumber").textValue();
+////            Mono<String> responseMono = externalApi.callExternalApiFoo(shopId, manageNumber);
+//            Mono<String> responseMono = webClient.get().uri("/shop").retrieve().bodyToMono(String.class);
+//            responses.add(responseMono);
+//        }
+//        return Flux.merge(responses)
+//                .collectList()
+//                .flatMap(response-> {
+//                    String combinedResponse = "";
+//                    for (String res : response) {
+//                        combinedResponse += res;
+//                    }
+//                return Mono.just(combinedResponse);
+//        });
     }
 }
