@@ -22,7 +22,7 @@ public class Aggregator {
     //    @CircuitBreaker(name = "externalServiceBar")
     public Mono<String> callExternalApiBar(JsonNode requestBody) {
         JsonNode requests = requestBody.get("request");
-        /*
+        /* This is completely parallel, but difficult to refactor now.
         return Flux.fromIterable(requests)
                 .parallel()
                 .flatMap((req) -> upstreamHandler.getResponse(req), Map.of("x", "y"))

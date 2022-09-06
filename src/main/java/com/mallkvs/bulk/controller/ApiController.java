@@ -19,6 +19,7 @@ public class ApiController {
     }
 
     @GetMapping("/foo")
+    // This is an endpoint for test, not for production.
     public Mono<String> foo() {
         return externalApi.callExternalApiFoo("100000", "234422344");
     }

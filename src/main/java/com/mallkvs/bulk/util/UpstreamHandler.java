@@ -19,17 +19,24 @@ public class UpstreamHandler {
 
     //aggregation/1.0.0/shop/289988/item/test
     public Mono<String> getResponse(JsonNode uriParamMap, Map<String, String> headerMap) {
-        String shopId = uriParamMap.get("shopId").textValue();
-        String manageNumber = uriParamMap.get("manageNumber").textValue();
-        URI uri = null;
-        try {
-            uri = new URI(String.format("aggregation/1.0.0/shop/%s/item/%s", shopId, manageNumber));
-        } catch (URISyntaxException ux) {
-            //TODO Error Log Here
-        }
+            String shopId = uriParamMap.get("shopId").textValue();
+            String manageNumber = uriParamMap.get("manageNumber").textValue();
+//        URI uri = null;
+//        try {
+//            uri = new URI(String.format("aggregation/1.0.0/shop/%s/item/%s", shopId, manageNumber));
+//        } catch (URISyntaxException ux) {
+//            //TODO Error Log Here
+//        }
+
+//        return webClient.get()
+//                .uri(uri)
+//                .retrieve()
+//                .bodyToMono(String.class);
         return webClient.get()
-                .uri(uri)
+                .uri(uriBuilder -> uriBuilder
+                        .path("/aggregation/1.0.0/shop/{shop}/item/{item}").build(shopId, manageNumber))
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class)
+                .log();
     }
 }
