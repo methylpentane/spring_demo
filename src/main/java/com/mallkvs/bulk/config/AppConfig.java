@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.mallkvs.bulk.config;
 
 import io.github.resilience4j.common.circuitbreaker.configuration.CircuitBreakerConfigCustomizer;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +11,7 @@ import java.time.Duration;
 import static io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType.COUNT_BASED;
 
 @Configuration
-public class ExternalApiConfig {
+public class AppConfig {
 
     @Value("${externalApi.baseUrl}")
     private String baseUrl;

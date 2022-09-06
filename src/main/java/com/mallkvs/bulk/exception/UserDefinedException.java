@@ -1,7 +1,7 @@
-package com.example.demo;
+package com.mallkvs.bulk.exception;
 
 public class UserDefinedException extends RuntimeException {
-    UserDefinedException(Throwable msg) {
+    public UserDefinedException(Throwable msg) {
         super(msg);
     }
 }

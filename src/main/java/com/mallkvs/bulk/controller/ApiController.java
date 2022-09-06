@@ -1,6 +1,8 @@
-package com.example.demo;
+package com.mallkvs.bulk.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mallkvs.bulk.service.ExternalApi;
+import com.mallkvs.bulk.service.Aggregator;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -9,9 +11,9 @@ import reactor.core.publisher.Mono;
 public class ApiController {
 
     private final ExternalApi externalApi;
-    private final ExternalApi2 externalApi2;
+    private final Aggregator externalApi2;
 
-    public ApiController(ExternalApi externalApi, ExternalApi2 externalApi2) {
+    public ApiController(ExternalApi externalApi, Aggregator externalApi2) {
         this.externalApi = externalApi;
         this.externalApi2 = externalApi2;
     }

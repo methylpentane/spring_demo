@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.mallkvs.bulk.controller;
 
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import org.springframework.http.HttpStatus;

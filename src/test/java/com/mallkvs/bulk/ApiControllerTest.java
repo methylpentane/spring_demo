@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.mallkvs.bulk;
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
