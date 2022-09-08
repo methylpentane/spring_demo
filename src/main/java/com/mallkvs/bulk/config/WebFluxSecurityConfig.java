@@ -23,12 +23,23 @@ public class WebFluxSecurityConfig {
 
     @Bean
     public MapReactiveUserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails user = User.withUsername("user")
+        UserDetails user1 = User.withUsername("alice")
                 .passwordEncoder(passwordEncoder::encode)
                 .password("password")
                 .roles("USER")
                 .build();
-        return new MapReactiveUserDetailsService(user);
+        UserDetails user2 = User.withUsername("bob")
+                .passwordEncoder(passwordEncoder::encode)
+                .password("password")
+                .roles("MANAGER")
+                .build();
+        UserDetails user3 = User.withUsername("carol")
+                .passwordEncoder(passwordEncoder::encode)
+                .password("password")
+                .roles("ADMIN")
+                .build();
+        UserDetails [] users = {user1, user2, user3};
+        return new MapReactiveUserDetailsService(users);
     }
 
     @Bean

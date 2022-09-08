@@ -1,6 +1,7 @@
 package com.mallkvs.bulk.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mallkvs.bulk.exception.InvalidRequestException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.stereotype.Component;
@@ -22,10 +23,25 @@ public class UpstreamHandler {
 
     //aggregation/1.0.0/shop/289988/item/test
     public Mono<String> getResponse(JsonNode uriParamMap, Map<String, String> headerMap) {
-        String shopId = uriParamMap.get("shopId").textValue();
-        String manageNumber = uriParamMap.get("manageNumber").textValue();
-        logger.info("shopId:" + shopId);
-        logger.info("manageNumber:" + manageNumber);
+        String shopId, manageNumber, xClientId, authorization;
+        try {
+            shopId = uriParamMap.get("shopId").textValue();
+            manageNumber = uriParamMap.get("manageNumber").textValue();
+        } catch (NullPointerException npe) {
+            throw new InvalidRequestException();
+        }
+        xClientId = headerMap.get("X-Client-Id");
+        authorization = headerMap.get("Authorization");
+        logger.info("shopId:" + shopId + ", manageNumber:" + manageNumber);
+
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/aggregation/1.0.0/shop/{shop}/item/{item}").build(shopId, manageNumber))
+                .header("X-Client-Id", xClientId)
+                .header("Authorization", authorization)
+                .retrieve()
+                .bodyToMono(String.class);
+//                .log();
 
         // sorry, it didn't works
 //        URI uri = null;
@@ -39,11 +55,5 @@ public class UpstreamHandler {
 //                .uri(uri)
 //                .retrieve()
 //                .bodyToMono(String.class);
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/aggregation/1.0.0/shop/{shop}/item/{item}").build(shopId, manageNumber))
-                .retrieve()
-                .bodyToMono(String.class);
-//                .log();
     }
 }

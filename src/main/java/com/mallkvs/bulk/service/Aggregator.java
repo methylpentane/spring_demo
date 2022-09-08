@@ -13,15 +13,21 @@ import java.util.Map;
 
 @Service
 public class Aggregator {
-    private UpstreamHandler upstreamHandler;
+    private final UpstreamHandler upstreamHandler;
 
     public Aggregator(UpstreamHandler upstreamHandler) {
         this.upstreamHandler = upstreamHandler;
     }
 
     //    @CircuitBreaker(name = "externalServiceBar")
-    public Mono<String> callExternalApiBar(JsonNode requestBody) {
-        JsonNode requests = requestBody.get("request");
+    public Mono<String> callExternalApiBar(JsonNode requestBody, Map<String, String> requestHeader) {
+        JsonNode requestBodies = requestBody.get("request");
+        List<Mono<String>> responses = new ArrayList<>();
+
+        requestBodies.forEach(body -> responses.add(upstreamHandler.getResponse(body, requestHeader)));
+        return Flux.merge(responses)
+                .collectList()
+                .flatMap(response-> Mono.just("[" + String.join(",", response) + "]"));
         /* This is completely parallel, but difficult to refactor now.
         return Flux.fromIterable(requests)
                 .parallel()
@@ -30,10 +36,5 @@ public class Aggregator {
                 .collectList()
                 .map(List::toString);
          */
-        List<Mono<String>> responses = new ArrayList<>();
-        requests.forEach(req-> responses.add(upstreamHandler.getResponse(req, Map.of())));
-        return Flux.merge(responses)
-                .collectList()
-                .flatMap(response-> Mono.just("[" + String.join(",", response) + "]"));
     }
 }
