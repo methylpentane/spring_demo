@@ -9,5 +9,24 @@ public class BulkInterfaceMain {
 	public static void main(String[] args) {
 		SpringApplication.run(BulkInterfaceMain.class, args);
 	}
+	/*
+	test request:
+
+	curl --location --request POST 'http://localhost:8080/bar' \
+	--header 'Content-Type: application/json' \
+	--header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
+	--data-raw '{
+	   "request":[
+		  {
+			 "shopId":"233264",
+			 "manageNumber":"2692349328233"
+		  },
+		  {
+			 "shopId":"233264",
+			 "manageNumber":"2692349328233"
+		  }
+	   ]
+	}'
+	 */
 
 }
