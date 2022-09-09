@@ -2,8 +2,10 @@ package com.mallkvs.bulk.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mallkvs.bulk.exception.InvalidRequestException;
+import com.mallkvs.bulk.exception.ServiceException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -36,11 +38,14 @@ public class UpstreamHandler {
 
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/aggregation/1.0.0/shop/{shop}/item/{item}").build(shopId, manageNumber))
+                        .path("/aggregation_404/1.0.0/shop/{shop}/item/{item}").build(shopId, manageNumber))
                 .header("X-Client-Id", xClientId)
                 .header("Authorization", authorization)
                 .retrieve()
-                .bodyToMono(String.class);
+                .onStatus(status -> status.value() == HttpStatus.SERVICE_UNAVAILABLE.value(),
+                        response -> Mono.error(new ServiceException("Not Found Error", response.statusCode().value())))
+                .bodyToMono(String.class)
+                .onErrorResume(e -> Mono.just("{\"message\", \"error\"}"));
 //                .log();
 
         // sorry, it didn't works
