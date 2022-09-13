@@ -1,7 +1,15 @@
 package com.mallkvs.bulk.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mallkvs.bulk.exception.ServiceException;
+import com.mallkvs.bulk.model.Response;
 import com.mallkvs.bulk.util.UpstreamHandler;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,20 +22,36 @@ import java.util.Map;
 @Service
 public class Aggregator {
     private final UpstreamHandler upstreamHandler;
+    private final ObjectMapper mapper;
 
-    public Aggregator(UpstreamHandler upstreamHandler) {
+    public Aggregator(UpstreamHandler upstreamHandler, ObjectMapper mapper) {
         this.upstreamHandler = upstreamHandler;
+        this.mapper = mapper;
     }
 
-    //    @CircuitBreaker(name = "externalServiceBar")
-    public Mono<String> callExternalApiBar(JsonNode requestBody, Map<String, String> requestHeader) {
+//        @CircuitBreaker(name = "externalServiceBar")
+    public Mono<ResponseEntity<ObjectNode>> callExternalApiBar(JsonNode requestBody, Map<String, String> requestHeader) {
         JsonNode requestBodies = requestBody.get("request");
-        List<Mono<String>> responses = new ArrayList<>();
+        List<Mono<Object>> responses = new ArrayList<>();
 
         requestBodies.forEach(body -> responses.add(upstreamHandler.getResponse(body, requestHeader)));
         return Flux.merge(responses)
                 .collectList()
-                .flatMap(response-> Mono.just("[" + String.join(",", response) + "]"));
+                .flatMap(response-> {
+                        ObjectNode result = new ObjectNode(JsonNodeFactory.instance);
+                        int expectedStatus = HttpStatus.OK.value();
+                        for(int index = 0; index < response.size(); index++) {
+                            Object responseObject = response.get(index);
+                            if(responseObject instanceof Response) {
+                                result.with("result").set(String.valueOf(index), mapper.valueToTree(responseObject));
+                            }else if(responseObject instanceof ServiceException){
+                                expectedStatus = HttpStatus.MULTI_STATUS.value();
+                                result.with("result").put(String.valueOf(index), ((ServiceException)responseObject).getMessage());
+                            }
+                        }
+                        return Mono.just(ResponseEntity.status(expectedStatus).body(result));
+                        //return Mono.just(new Response(HttpStatus.OK.value(), "[" + String.join(",", responseList) + "]"));
+                });
         /* This is completely parallel, but difficult to refactor now.
         return Flux.fromIterable(requests)
                 .parallel()
