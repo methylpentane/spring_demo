@@ -30,8 +30,8 @@ public class ApiController {
     @RequestMapping(value = { "/bar", "/" }, method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public Mono<String> bar(@RequestBody JsonNode rootNode, @RequestHeader Map<String, String> requestHeader) {
-        String xClientId = requestHeader.getOrDefault("X-Client-Id", "");
-        if (!xClientId.equals("mallkvs")) { throw new InvalidRequestException(); }
+//        String xClientId = requestHeader.getOrDefault("X-Client-Id", "");
+//        if (!xClientId.equals("mallkvs")) { throw new InvalidRequestException(); }
         return aggregator.callExternalApiBar(rootNode, requestHeader);
     }
 }

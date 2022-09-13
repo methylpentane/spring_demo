@@ -13,7 +13,7 @@ import static io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.Sliding
 @Configuration
 public class AppConfig {
 
-    @Value("${externalApi.baseUrl}")
+    @Value("${baseUrl}")
     private String baseUrl;
 
     @Bean

@@ -5,19 +5,22 @@ import com.mallkvs.bulk.exception.InvalidRequestException;
 import com.mallkvs.bulk.exception.ServiceException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 
 @Component
 public class UpstreamHandler {
-    static final Logger logger = LogManager.getLogger(UpstreamHandler.class.getName());
+    @Value("${aggregationEndpoint}")
+    private String aggregationEndpoint;
+    @Value("${aggregationEndpointError}")
+    private String aggregationEndpointError;
     private final WebClient webClient;
+    static final Logger logger = LogManager.getLogger(UpstreamHandler.class.getName());
 
     public UpstreamHandler(WebClient webClient) {
         this.webClient = webClient;
@@ -38,7 +41,7 @@ public class UpstreamHandler {
 
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/aggregation_404/1.0.0/shop/{shop}/item/{item}").build(shopId, manageNumber))
+                        .path(aggregationEndpointError).build(shopId, manageNumber))
                 .header("X-Client-Id", xClientId)
                 .header("Authorization", authorization)
                 .retrieve()
@@ -48,17 +51,19 @@ public class UpstreamHandler {
                 .onErrorResume(e -> Mono.just("{\"message\", \"error\"}"));
 //                .log();
 
-        // sorry, it didn't works
-//        URI uri = null;
-//        try {
-//            uri = new URI(String.format("aggregation/1.0.0/shop/%s/item/%s", shopId, manageNumber));
-//        } catch (URISyntaxException ux) {
-//            //TODO Error Log Here
-//        }
+            /* sorry, it didn't works (using java.net.URI)
+            URI uri = null;
+            try {
+                uri = new URI(String.format("aggregation/1.0.0/shop/%s/item/%s", shopId, manageNumber));
+            } catch (URISyntaxException ux) {
+                //TODO Error Log Here
+            }
 
-//        return webClient.get()
-//                .uri(uri)
-//                .retrieve()
-//                .bodyToMono(String.class);
+            return webClient.get()
+                    .uri(uri)
+                    .retrieve()
+                    .bodyToMono(String.class);
+
+            */
     }
 }
