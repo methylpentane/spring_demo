@@ -50,7 +50,6 @@ public class Aggregator {
                             }
                         }
                         return Mono.just(ResponseEntity.status(expectedStatus).body(result));
-                        //return Mono.just(new Response(HttpStatus.OK.value(), "[" + String.join(",", responseList) + "]"));
                 });
         /* This is completely parallel, but difficult to refactor now.
         return Flux.fromIterable(requests)

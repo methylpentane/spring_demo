@@ -17,7 +17,7 @@ import java.time.temporal.ChronoUnit;
 public class ExternalApi {
     private final WebClient webClient;
 
-    @CircuitBreaker(name = "externalServiceFoo")
+    @CircuitBreaker(name = "defaultCircuitBreaker")
     public Mono<String> callExternalApiFoo(String shopId, String manageNumber) {
         try {
             return webClient
