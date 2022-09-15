@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mallkvs.bulk.exception.ServiceException;
 import com.mallkvs.bulk.model.Response;
 import com.mallkvs.bulk.util.UpstreamHandler;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,7 @@ public class Aggregator {
     }
 
 //        @CircuitBreaker(name = "externalServiceBar")
-    public Mono<ResponseEntity<ObjectNode>> callExternalApiBar(JsonNode requestBody, Map<String, String> requestHeader) {
+    public Mono<ResponseEntity<ObjectNode>> callAggregation(JsonNode requestBody, Map<String, String> requestHeader) {
         JsonNode requestBodies = requestBody.get("request");
         List<Mono<Object>> responses = new ArrayList<>();
 

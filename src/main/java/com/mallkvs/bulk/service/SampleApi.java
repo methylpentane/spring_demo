@@ -14,15 +14,15 @@ import java.time.temporal.ChronoUnit;
 
 @Component
 @RequiredArgsConstructor
-public class ExternalApi {
+public class SampleApi {
     private final WebClient webClient;
 
     @CircuitBreaker(name = "defaultCircuitBreaker")
-    public Mono<String> callExternalApiFoo(String shopId, String manageNumber) {
+    public Mono<String> callSampleApi(String shopId, String manageNumber) {
         try {
             return webClient
                     .get()
-                    .uri("/external-foo").retrieve()
+                    .uri("/hello").retrieve()
                     .bodyToMono(String.class)
                     .onErrorResume(Mono::error)
                     .retryWhen(
