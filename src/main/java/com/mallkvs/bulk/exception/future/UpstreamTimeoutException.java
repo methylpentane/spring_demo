@@ -1,4 +1,4 @@
-package com.mallkvs.bulk.exception;
+package com.mallkvs.bulk.exception.future;
 
 import org.springframework.http.HttpStatus;
 

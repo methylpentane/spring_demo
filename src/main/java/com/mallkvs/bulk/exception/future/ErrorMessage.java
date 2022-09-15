@@ -1,4 +1,4 @@
-package com.mallkvs.bulk.exception;
+package com.mallkvs.bulk.exception.future;
 
 public class ErrorMessage {
     public static final String RESOURCE_NOT_FOUND =

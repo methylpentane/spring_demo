@@ -1,7 +1,7 @@
 package com.mallkvs.bulk.service;
 
 
-import com.mallkvs.bulk.exception.UserDefinedException;
+import com.mallkvs.bulk.exception.SampleException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -27,9 +27,9 @@ public class SampleApi {
                     .onErrorResume(Mono::error)
                     .retryWhen(
                             Retry.backoff(3, Duration.of(1, ChronoUnit.SECONDS))
-                                    .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> new UserDefinedException(retrySignal.failure()))
+                                    .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> new SampleException(retrySignal.failure()))
                     );
-        } catch(UserDefinedException ude) {
+        } catch(SampleException ude) {
             return Mono.just(ude.getMessage());
         }
     }
