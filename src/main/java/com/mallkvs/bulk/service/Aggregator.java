@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mallkvs.bulk.exception.InvalidRequestException;
 import com.mallkvs.bulk.exception.ServiceException;
 import com.mallkvs.bulk.model.Response;
 import com.mallkvs.bulk.util.UpstreamHandler;
@@ -12,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +36,9 @@ public class Aggregator {
         JsonNode requestBodies = requestBody.get("request");
         List<Mono<Object>> responses = new ArrayList<>();
 
+        if(requestBodies.size() > 20) return Mono.error(new InvalidRequestException("Number of requests exceeds 20"));
+        else if(requestBodies.size() == 0) return Mono.error(new InvalidRequestException("No requests"));
+
         requestBodies.forEach(body -> responses.add(upstreamHandler.getResponse(body, requestHeader)));
         return Flux.merge(responses)
                 .collectList()
@@ -46,7 +52,6 @@ public class Aggregator {
                             }else if(responseObject instanceof ServiceException){
                                 expectedStatus = HttpStatus.MULTI_STATUS.value();
                                 result.with("result").put(String.valueOf(index), ((ServiceException)responseObject).getMessage());
-                            }
                         }
                         return Mono.just(ResponseEntity.status(expectedStatus).body(result));
                 });

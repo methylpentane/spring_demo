@@ -35,7 +35,7 @@ public class UpstreamHandler {
             shopId = uriParamMap.get("shopId").textValue();
             manageNumber = uriParamMap.get("manageNumber").textValue();
         } catch (NullPointerException npe) {
-            throw new InvalidRequestException();
+            return Mono.error(new InvalidRequestException("There is missing parameter."));
         }
         logger.info("shopId:" + shopId + ", manageNumber:" + manageNumber);
         // header
