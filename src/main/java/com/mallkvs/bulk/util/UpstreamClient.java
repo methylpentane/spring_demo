@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mallkvs.bulk.exception.InvalidRequestException;
 import com.mallkvs.bulk.exception.UpstreamErrorResponseException;
+import com.mallkvs.bulk.exception.UpstreamTimeoutException;
 import com.mallkvs.bulk.model.Response;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.Map;
 
 @Component
@@ -67,7 +69,8 @@ public class UpstreamClient {
                                                         objectNode)
                                         );
                             }
-                        });
+                        })
+                .timeout(Duration.ofSeconds(1), Mono.just("Aggregator").map(UpstreamTimeoutException::new));
                 /* TODO Exception handling template
                 .onErrorResume(
                         throwable -> {

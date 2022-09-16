@@ -7,9 +7,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mallkvs.bulk.exception.InvalidRequestException;
 import com.mallkvs.bulk.exception.ServiceException;
 import com.mallkvs.bulk.exception.UpstreamErrorResponseException;
+import com.mallkvs.bulk.exception.UpstreamTimeoutException;
 import com.mallkvs.bulk.model.Response;
 import com.mallkvs.bulk.util.UpstreamClient;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,7 @@ import java.util.Map;
 public class Aggregator {
     private final UpstreamClient upstreamClient;
     private final ObjectMapper mapper;
+    static final Logger logger = LogManager.getLogger(Aggregator.class.getName());
 
     public Aggregator(UpstreamClient upstreamClient, ObjectMapper mapper) {
         this.upstreamClient = upstreamClient;
@@ -47,6 +51,7 @@ public class Aggregator {
                         int okCount = 0;
                         for(int index = 0; index < response.size(); index++) {
                             Object responseObject = response.get(index);
+                            logger.info(responseObject.toString());
                             if(responseObject instanceof Response) {
                                 okCount ++;
                                 result.with("result")
@@ -54,6 +59,9 @@ public class Aggregator {
                             }else if(responseObject instanceof UpstreamErrorResponseException) {
                                 result.with("result")
                                         .put(String.valueOf(index), ((UpstreamErrorResponseException) responseObject).getMessage());
+                            }else if(responseObject instanceof UpstreamTimeoutException) {
+                                result.with("result")
+                                        .put(String.valueOf(index), ((UpstreamTimeoutException) responseObject).getErrorMessage());
                             }
                         }
                         int resultStatusCode;
@@ -65,12 +73,12 @@ public class Aggregator {
                             resultStatusCode = HttpStatus.SERVICE_UNAVAILABLE.value();
                             return Mono.error(new ServiceException(503, "All request failed to retrieve."));
                         }
-                })
+                });
 //                .retryWhen(
 //                        Retry.backoff(1, Duration.of(1, ChronoUnit.SECONDS))
 //                                .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> new ServiceException(503, retrySignal.failure()))
 //                )
-                .log();
+//                .log();
         /* This is completely parallel, but difficult to refactor now.
         return Flux.fromIterable(requests)
                 .parallel()

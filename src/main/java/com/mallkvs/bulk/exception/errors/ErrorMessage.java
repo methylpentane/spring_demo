@@ -1,11 +1,11 @@
-package com.mallkvs.bulk.exception.future;
+package com.mallkvs.bulk.exception.errors;
 
 public class ErrorMessage {
     public static final String RESOURCE_NOT_FOUND =
             "Resource Not found, Wrong Endpoint or PathParameters";
     public static final String CACHE_KEY_NOT_FOUND = "Cache Key is not found.";
     public static final String HTTP_METHOD_NOT_ALLOWED = "%s HTTP Method not allowed.";
-    public static final String NOT_ACCEPTABLE = "%s is not the acceptable value.";
+//    public static final String NOT_ACCEPTABLE = "%s is not the acceptable value.";
     public static final String WRONG_AUTHENTICATION_INFORMATION =
             "Wrong Authentication information (Header)";
     public static final String WRONG_AUTHORIZATION_INFORMATION = "Wrong Authorization information";

@@ -1,4 +1,4 @@
-package com.mallkvs.bulk.exception.future;
+package com.mallkvs.bulk.exception.errors;
 
 import java.util.HashMap;
 import java.util.Map;

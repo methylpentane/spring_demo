@@ -1,5 +1,7 @@
-package com.mallkvs.bulk.exception.future;
+package com.mallkvs.bulk.exception;
 
+import com.mallkvs.bulk.exception.errors.ErrorCode;
+import com.mallkvs.bulk.exception.errors.ErrorMessage;
 import org.springframework.http.HttpStatus;
 
 public class UpstreamTimeoutException extends AggregationServiceException {
