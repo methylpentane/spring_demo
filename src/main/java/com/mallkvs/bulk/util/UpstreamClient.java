@@ -3,28 +3,25 @@ package com.mallkvs.bulk.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mallkvs.bulk.exception.InvalidRequestException;
-import com.mallkvs.bulk.exception.ServiceException;
+import com.mallkvs.bulk.exception.UpstreamErrorResponseException;
 import com.mallkvs.bulk.model.Response;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.util.Map;
-import java.util.Objects;
 
 @Component
-public class UpstreamHandler {
+public class UpstreamClient {
     @Value("${aggregationEndpoint}")
     private String aggregationEndpoint;
     private final WebClient webClient;
-    static final Logger logger = LogManager.getLogger(UpstreamHandler.class.getName());
+    static final Logger logger = LogManager.getLogger(UpstreamClient.class.getName());
 
-    public UpstreamHandler(WebClient webClient) {
+    public UpstreamClient(WebClient webClient) {
         this.webClient = webClient;
     }
 
@@ -56,7 +53,7 @@ public class UpstreamHandler {
                                 return clientResponse
                                         .bodyToMono(String.class)
                                         .map(
-                                                string -> new ServiceException(
+                                                string -> new UpstreamErrorResponseException(
                                                         clientResponse.rawStatusCode(),
                                                         string)
                                         );
