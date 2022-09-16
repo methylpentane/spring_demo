@@ -49,9 +49,10 @@ public class Aggregator {
                             Object responseObject = response.get(index);
                             if(responseObject instanceof Response) {
                                 result.with("result").set(String.valueOf(index), mapper.valueToTree(responseObject));
-                            }else if(responseObject instanceof ServiceException){
+                            }else if(responseObject instanceof ServiceException) {
                                 expectedStatus = HttpStatus.MULTI_STATUS.value();
-                                result.with("result").put(String.valueOf(index), ((ServiceException)responseObject).getMessage());
+                                result.with("result").put(String.valueOf(index), ((ServiceException) responseObject).getMessage());
+                            }
                         }
                         return Mono.just(ResponseEntity.status(expectedStatus).body(result));
                 });
