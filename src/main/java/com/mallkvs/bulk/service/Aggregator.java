@@ -8,6 +8,7 @@ import com.mallkvs.bulk.exception.InvalidRequestException;
 import com.mallkvs.bulk.exception.ServiceException;
 import com.mallkvs.bulk.model.Response;
 import com.mallkvs.bulk.util.UpstreamHandler;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +35,7 @@ public class Aggregator {
         this.mapper = mapper;
     }
 
-//        @CircuitBreaker(name = "externalServiceBar")
+    @CircuitBreaker(name = "defaultCircuitBreaker")
     public Mono<ResponseEntity<ObjectNode>> callAggregation(JsonNode requestBody, Map<String, String> requestHeader) {
         JsonNode requestBodies = requestBody.get("request");
         List<Mono<Object>> responses = new ArrayList<>();
@@ -58,11 +62,17 @@ public class Aggregator {
                         if (okCount > 0) {
                             if (okCount == response.size()) resultStatusCode = HttpStatus.OK.value();
                             else resultStatusCode = HttpStatus.MULTI_STATUS.value();
+                            return Mono.just(ResponseEntity.status(resultStatusCode).body(result));
                         }else{
                             resultStatusCode = HttpStatus.SERVICE_UNAVAILABLE.value();
+                            return Mono.error(new ServiceException(503, "test exception(no ok)"));
                         }
-                        return Mono.just(ResponseEntity.status(resultStatusCode).body(result));
-                });
+                })
+                .retryWhen(
+                        Retry.backoff(1, Duration.of(1, ChronoUnit.SECONDS))
+                                .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> new ServiceException(503, retrySignal.failure()))
+                )
+                .log();
         /* This is completely parallel, but difficult to refactor now.
         return Flux.fromIterable(requests)
                 .parallel()

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class InvalidRequestHandler {
     static final Logger logger = LogManager.getLogger(InvalidRequestHandler.class.toString());
     @ExceptionHandler({InvalidRequestException.class})
-    public ResponseEntity<String> handleInvalidRequestException(InvalidRequestException e) {
+    public ResponseEntity<String> handle(InvalidRequestException e) {
         String errorMessage = e.getMessage();
         logger.error(errorMessage);
         return new ResponseEntity<String>(errorMessage, HttpStatus.BAD_REQUEST);
