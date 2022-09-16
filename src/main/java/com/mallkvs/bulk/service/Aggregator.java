@@ -44,17 +44,24 @@ public class Aggregator {
                 .collectList()
                 .flatMap(response-> {
                         ObjectNode result = new ObjectNode(JsonNodeFactory.instance);
-                        int expectedStatus = HttpStatus.OK.value();
+                        int okCount = 0;
                         for(int index = 0; index < response.size(); index++) {
                             Object responseObject = response.get(index);
                             if(responseObject instanceof Response) {
+                                okCount ++;
                                 result.with("result").set(String.valueOf(index), mapper.valueToTree(responseObject));
                             }else if(responseObject instanceof ServiceException) {
-                                expectedStatus = HttpStatus.MULTI_STATUS.value();
                                 result.with("result").put(String.valueOf(index), ((ServiceException) responseObject).getMessage());
                             }
                         }
-                        return Mono.just(ResponseEntity.status(expectedStatus).body(result));
+                        int resultStatusCode;
+                        if (okCount > 0) {
+                            if (okCount == response.size()) resultStatusCode = HttpStatus.OK.value();
+                            else resultStatusCode = HttpStatus.MULTI_STATUS.value();
+                        }else{
+                            resultStatusCode = HttpStatus.SERVICE_UNAVAILABLE.value();
+                        }
+                        return Mono.just(ResponseEntity.status(resultStatusCode).body(result));
                 });
         /* This is completely parallel, but difficult to refactor now.
         return Flux.fromIterable(requests)
