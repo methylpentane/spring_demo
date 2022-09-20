@@ -80,18 +80,5 @@ public class Aggregator {
                             return Mono.error(new ServiceException(503, "All request failed to retrieve."));
                         }
                 });
-//                .retryWhen(
-//                        Retry.backoff(1, Duration.of(1, ChronoUnit.SECONDS))
-//                                .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> new ServiceException(503, retrySignal.failure()))
-//                )
-//                .log();
-        /* This is completely parallel, but difficult to refactor now.
-        return Flux.fromIterable(requests)
-                .parallel()
-                .flatMap((req) -> upstreamHandler.getResponse(req), Map.of("x", "y"))
-                .sequential()
-                .collectList()
-                .map(List::toString);
-         */
     }
 }
