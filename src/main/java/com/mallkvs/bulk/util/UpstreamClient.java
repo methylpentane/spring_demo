@@ -20,6 +20,8 @@ import java.util.Map;
 public class UpstreamClient {
     @Value("${aggregationEndpoint}")
     private String aggregationEndpoint;
+    @Value("${timeoutMillis}")
+    private int timeoutMillis;
     private final WebClient webClient;
     static final Logger logger = LogManager.getLogger(UpstreamClient.class.getName());
 
@@ -71,7 +73,7 @@ public class UpstreamClient {
                                         );
                             }
                         })
-                .timeout(Duration.ofSeconds(1), Mono.just("Timeout has occurred.").map(UpstreamTimeoutException::new));
+                .timeout(Duration.ofMillis(timeoutMillis), Mono.just("Timeout has occurred.").map(UpstreamTimeoutException::new));
                 /* TODO Exception handling template
                 .onErrorResume(
                         throwable -> {
