@@ -49,6 +49,7 @@ public class UpstreamClient {
                 .header("X-Client-Id", xClientId)
                 .header("Authorization", authorization)
                 .exchangeToMono(
+                        // if statement, on status from upstream
                         clientResponse -> {
                             if (clientResponse.statusCode().isError()) {
                                 // when error occur expected to have error string

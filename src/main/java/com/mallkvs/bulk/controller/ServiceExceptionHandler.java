@@ -1,6 +1,5 @@
 package com.mallkvs.bulk.controller;
 
-import com.mallkvs.bulk.exception.InvalidRequestException;
 import com.mallkvs.bulk.exception.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

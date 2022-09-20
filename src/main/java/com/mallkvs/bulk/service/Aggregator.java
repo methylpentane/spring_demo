@@ -37,18 +37,23 @@ public class Aggregator {
 
     @CircuitBreaker(name = "defaultCircuitBreaker")
     public Mono<ResponseEntity<ObjectNode>> callAggregation(JsonNode requestBody, Map<String, String> requestHeader) {
+        // extract requests for upstream
         JsonNode requestBodies = requestBody.get("request");
         List<Mono<Object>> responses = new ArrayList<>();
 
+        // request param check
         if(requestBodies.size() > 20) return Mono.error(new InvalidRequestException("Number of requests exceeds 20"));
         else if(requestBodies.size() == 0) return Mono.error(new InvalidRequestException("No requests"));
 
+        // retrieve not in parallel (temporal implementation)
         requestBodies.forEach(body -> responses.add(upstreamClient.getResponse(body, requestHeader)));
+        // aggregate
         return Flux.merge(responses)
                 .collectList()
                 .flatMap(response-> {
                         ObjectNode result = new ObjectNode(JsonNodeFactory.instance);
                         int okCount = 0;
+                        // check each response, append to result
                         for(int index = 0; index < response.size(); index++) {
                             Object responseObject = response.get(index);
                             logger.info(responseObject.toString());
@@ -64,6 +69,7 @@ public class Aggregator {
                                         .put(String.valueOf(index), ((UpstreamTimeoutException) responseObject).getErrorMessage());
                             }
                         }
+                        // decide final status, return
                         int resultStatusCode;
                         if (okCount > 0) {
                             if (okCount == response.size()) resultStatusCode = HttpStatus.OK.value();
