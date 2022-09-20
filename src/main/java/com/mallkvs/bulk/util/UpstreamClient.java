@@ -18,6 +18,11 @@ import java.util.Map;
 
 @Component
 public class UpstreamClient {
+    /**
+     * A component that has role of retrieving single response from upstream.
+     * it validates parameter and retrieve from upstream.
+     * When error occurs, it won't return Mono.error() because error result will also be aggregated by service.
+     */
     @Value("${aggregationEndpoint}")
     private String aggregationEndpoint;
     @Value("${timeoutMillis}")

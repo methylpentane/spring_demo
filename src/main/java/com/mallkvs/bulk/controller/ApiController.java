@@ -11,8 +11,9 @@ import java.util.Map;
 
 @RestController
 public class ApiController {
-    /*
-    Controller
+    /**
+     * General Controller
+     * define service method with uri mapping
      */
 
     private final Aggregator aggregator;

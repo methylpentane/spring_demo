@@ -7,6 +7,9 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class Response {
+    /**
+     * POJO that deserialize response from upstream.
+     */
     private int httpStatus;
     private ObjectNode response;
 }

@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class ServiceExceptionHandler {
+    /**
+     * System will throw ServiceException, when it cannot return normal response (e.g. all individual request gets 404).
+     * This ControllerAdvice provide an handling feature of the exception to controllers.
+     * It returns fallback response (503) when the exception is thrown.
+     */
     static final Logger logger = LogManager.getLogger(ServiceExceptionHandler.class.toString());
     @ExceptionHandler({ServiceException.class})
     public ResponseEntity<String> handle(ServiceException e) {

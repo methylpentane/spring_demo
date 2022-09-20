@@ -26,6 +26,11 @@ import java.util.Map;
 
 @Service
 public class Aggregator {
+    /**
+     * aggregator service of this server.
+     * validate request, send and collect each request from upstream.
+     * return aggregated result to client.
+     */
     private final UpstreamClient upstreamClient;
     private final ObjectMapper mapper;
     static final Logger logger = LogManager.getLogger(Aggregator.class.getName());
@@ -37,6 +42,7 @@ public class Aggregator {
 
     @CircuitBreaker(name = "defaultCircuitBreaker")
     public Mono<ResponseEntity<ObjectNode>> callAggregation(JsonNode requestBody, Map<String, String> requestHeader) {
+
         // extract requests for upstream
         JsonNode requestBodies = requestBody.get("request");
         List<Mono<Object>> responses = new ArrayList<>();

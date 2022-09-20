@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class InvalidRequestHandler {
+    /**
+     * System will throw InvalidRequestException, when it finds incorrectness of request body.
+     * This ControllerAdvice provide an handling feature of the exception to controllers.
+     * It returns fallback response (400) when the exception is thrown.
+     */
     static final Logger logger = LogManager.getLogger(InvalidRequestHandler.class.toString());
     @ExceptionHandler({InvalidRequestException.class})
     public ResponseEntity<String> handle(InvalidRequestException e) {

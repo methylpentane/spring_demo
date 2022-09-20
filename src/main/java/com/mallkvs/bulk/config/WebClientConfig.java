@@ -7,8 +7,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class WebClientConfig {
-    /*
-    webclient bean and default setting
+    /**
+     * webclient bean and default setting
      */
 
     @Value("${baseUrl}")

@@ -10,8 +10,12 @@ import static io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.Sliding
 
 @Configuration
 public class CircuitBreakerConfig {
-    /*
-    circuit breaker bean
+    /**
+     * Circuit Breaker bean
+     * This can be used with adding @CircuitBreaker on service method.
+     * CircuitBreaker will open (make unavailable) when consecutive exception is returned from the service method.
+     * Once CircuitBreaker has opened, access to the service cause CallNotPermittedException.
+     * CircuitBreaker will close again after some seconds (duration is configurable).
      */
 
     @Bean
