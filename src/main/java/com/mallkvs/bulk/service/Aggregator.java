@@ -66,7 +66,7 @@ public class Aggregator {
                                         .put(String.valueOf(index), ((UpstreamErrorResponseException) responseObject).getMessage());
                             }else if(responseObject instanceof UpstreamTimeoutException) {
                                 result.with("result")
-                                        .put(String.valueOf(index), ((UpstreamTimeoutException) responseObject).getErrorMessage());
+                                        .put(String.valueOf(index), ((UpstreamTimeoutException) responseObject).getMessage());
                             }
                         }
                         // decide final status, return

@@ -9,11 +9,6 @@ public class ServiceException extends RuntimeException {
         this.statusCode = statusCode;
     }
 
-    public ServiceException (int statusCode, Throwable th) {
-        super(th);
-        this.statusCode = statusCode;
-    }
-
     public int getStatusCode() {
         return statusCode;
     }

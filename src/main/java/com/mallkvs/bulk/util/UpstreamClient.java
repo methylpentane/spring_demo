@@ -71,7 +71,7 @@ public class UpstreamClient {
                                         );
                             }
                         })
-                .timeout(Duration.ofSeconds(1), Mono.just("Aggregator").map(UpstreamTimeoutException::new));
+                .timeout(Duration.ofSeconds(1), Mono.just("Timeout has occurred.").map(UpstreamTimeoutException::new));
                 /* TODO Exception handling template
                 .onErrorResume(
                         throwable -> {
