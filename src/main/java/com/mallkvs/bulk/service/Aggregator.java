@@ -40,7 +40,7 @@ public class Aggregator {
         this.mapper = mapper;
     }
 
-    @CircuitBreaker(name = "defaultCircuitBreaker")
+//    @CircuitBreaker(name = "defaultCircuitBreaker")
     public Mono<ResponseEntity<ObjectNode>> callAggregation(JsonNode requestBody, Map<String, String> requestHeader) {
 
         // extract requests for upstream

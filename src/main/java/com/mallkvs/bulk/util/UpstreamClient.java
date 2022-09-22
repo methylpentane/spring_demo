@@ -6,6 +6,10 @@ import com.mallkvs.bulk.exception.InvalidRequestException;
 import com.mallkvs.bulk.exception.UpstreamErrorResponseException;
 import com.mallkvs.bulk.exception.UpstreamTimeoutException;
 import com.mallkvs.bulk.model.Response;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,13 +34,20 @@ public class UpstreamClient {
     @Value("${timeoutMillis}")
     private int timeoutMillis;
     private final WebClient webClient;
+    CircuitBreakerConfig circuitBreakerConfig = CircuitBreakerConfig.custom()
+            .slidingWindowSize(5)
+            .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
+            .failureRateThreshold(50)
+            .waitDurationInOpenState(Duration.ofSeconds(5))
+            .build();
+    CircuitBreakerRegistry circuitBreakerRegistry = CircuitBreakerRegistry.of(circuitBreakerConfig);
     static final Logger logger = LogManager.getLogger(UpstreamClient.class.getName());
 
     public UpstreamClient(WebClient webClient) {
         this.webClient = webClient;
     }
 
-    //aggregation/1.0.0/shop/289988/item/test
+//    @CircuitBreaker(name = "defaultCircuitBreaker")
     public Mono<Object> getResponse(JsonNode uriParamMap, Map<String, String> headerMap) {
         String shopId, manageNumber, xClientId, authorization;
         // parameter
@@ -85,7 +96,8 @@ public class UpstreamClient {
                         Retry.backoff(1, Duration.of(1, ChronoUnit.SECONDS))
                                 .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> new UpstreamTimeoutException("Timeout has occurred."))
                 )
-                .log()
+                // this CB is for only timeout for now.
+                .transform(CircuitBreakerOperator.of(circuitBreakerRegistry.circuitBreaker("default")))
                 .onErrorResume(UpstreamTimeoutException.class, e -> Mono.just(e.getMessage()).map(UpstreamTimeoutException::new));
     }
 }
