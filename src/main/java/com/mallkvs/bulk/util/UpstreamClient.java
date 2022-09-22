@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 @Component
@@ -78,6 +80,12 @@ public class UpstreamClient {
                                         );
                             }
                         })
-                .timeout(Duration.ofMillis(timeoutMillis), Mono.just("Timeout has occurred.").map(UpstreamTimeoutException::new));
+                .timeout(Duration.ofMillis(timeoutMillis))
+                .retryWhen(
+                        Retry.backoff(1, Duration.of(1, ChronoUnit.SECONDS))
+                                .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> new UpstreamTimeoutException("Timeout has occurred."))
+                )
+                .log()
+                .onErrorResume(UpstreamTimeoutException.class, e -> Mono.just(e.getMessage()).map(UpstreamTimeoutException::new));
     }
 }
