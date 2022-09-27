@@ -34,17 +34,12 @@ public class UpstreamClient {
     @Value("${timeoutMillis}")
     private int timeoutMillis;
     private final WebClient webClient;
-    CircuitBreakerConfig circuitBreakerConfig = CircuitBreakerConfig.custom()
-            .slidingWindowSize(5)
-            .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
-            .failureRateThreshold(50)
-            .waitDurationInOpenState(Duration.ofSeconds(5))
-            .build();
-    CircuitBreakerRegistry circuitBreakerRegistry = CircuitBreakerRegistry.of(circuitBreakerConfig);
+    private final CircuitBreakerRegistry circuitBreakerRegistry;
     static final Logger logger = LogManager.getLogger(UpstreamClient.class.getName());
 
-    public UpstreamClient(WebClient webClient) {
+    public UpstreamClient(WebClient webClient, CircuitBreakerRegistry circuitBreakerRegistry) {
         this.webClient = webClient;
+        this.circuitBreakerRegistry = circuitBreakerRegistry;
     }
 
 //    @CircuitBreaker(name = "defaultCircuitBreaker")
