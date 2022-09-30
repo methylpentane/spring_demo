@@ -10,6 +10,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
+import io.netty.handler.timeout.ReadTimeoutException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Value;
@@ -94,5 +95,6 @@ public class UpstreamClient {
                 // this CB is for only timeout for now.
                 .transform(CircuitBreakerOperator.of(circuitBreakerRegistry.circuitBreaker("default")))
                 .onErrorResume(UpstreamTimeoutException.class, e -> Mono.just(e.getMessage()).map(UpstreamTimeoutException::new));
+//                .onErrorResume(ReadTimeoutException.class, e -> Mono.just(e.getMessage()).map(UpstreamTimeoutException::new));
     }
 }
