@@ -1,0 +1,20 @@
+[
+  {
+    "username": "alice",
+    "password": "cGFzc3dvcmQ=",
+    "role": "INTERNAL_USER",
+    "accountExpired": false
+  },
+  {
+    "username": "bob",
+    "password": "cGFzc3dvcmQ=",
+    "role": "EXTERNAL_USER",
+    "accountExpired": false
+  },
+  {
+    "username": "carol",
+    "password": "cGFzc3dvcmQ=",
+    "role": "EXTERNAL_USER",
+    "accountExpired": true
+  }
+]
