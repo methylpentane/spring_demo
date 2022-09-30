@@ -5,7 +5,6 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,9 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 @Configuration
 public class WebClientConfig {
@@ -24,7 +21,7 @@ public class WebClientConfig {
      * webclient bean and default setting
      */
 
-    @Value("${baseUrl}")
+    @Value("${webclient.baseUrl}")
     private String baseUrl;
     private final CircuitBreakerConfig circuitBreakerConfig;
 
@@ -45,7 +42,7 @@ public class WebClientConfig {
                           .addHandlerLast(new ReadTimeoutHandler(1000, TimeUnit.MILLISECONDS))
                           .addHandlerLast(new WriteTimeoutHandler(1000, TimeUnit.MILLISECONDS)));
         return WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(client)).baseUrl(baseUrl).build();
+                .clientConnector(new ReactorClientHttpConnector(client)).baseUrl(this.baseUrl).build();
     }
 
     @Bean

@@ -32,8 +32,6 @@ public class UpstreamClient {
      */
     @Value("${aggregationEndpoint}")
     private String aggregationEndpoint;
-    @Value("${timeoutMillis}")
-    private int timeoutMillis;
     private final WebClient webClient;
     private final CircuitBreakerRegistry circuitBreakerRegistry;
     static final Logger logger = LogManager.getLogger(UpstreamClient.class.getName());
@@ -87,7 +85,6 @@ public class UpstreamClient {
                                         );
                             }
                         })
-                .timeout(Duration.ofMillis(timeoutMillis))
                 .retryWhen(
                         Retry.backoff(1, Duration.of(1, ChronoUnit.SECONDS))
                                 .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> new UpstreamTimeoutException("Timeout has occurred."))
@@ -95,6 +92,5 @@ public class UpstreamClient {
                 // this CB is for only timeout for now.
                 .transform(CircuitBreakerOperator.of(circuitBreakerRegistry.circuitBreaker("default")))
                 .onErrorResume(UpstreamTimeoutException.class, e -> Mono.just(e.getMessage()).map(UpstreamTimeoutException::new));
-//                .onErrorResume(ReadTimeoutException.class, e -> Mono.just(e.getMessage()).map(UpstreamTimeoutException::new));
     }
 }
