@@ -13,10 +13,11 @@ import static io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.Sliding
 @Configuration
 public class UpstreamCircuitBreakerConfig {
     /**
-     * Circuit Breaker Config bean
+     * @return CircuitBreakerConfig Bean
      */
     @Bean
     public CircuitBreakerConfig circuitBreakerConfig() {
+        // TODO: externalize property
         return CircuitBreakerConfig.custom()
                 .maxWaitDurationInHalfOpenState(Duration.ofSeconds(10))
                 .slowCallRateThreshold(50)

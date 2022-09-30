@@ -6,11 +6,8 @@ import com.mallkvs.bulk.exception.InvalidRequestException;
 import com.mallkvs.bulk.exception.UpstreamErrorResponseException;
 import com.mallkvs.bulk.exception.UpstreamTimeoutException;
 import com.mallkvs.bulk.model.Response;
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
-import io.netty.handler.timeout.ReadTimeoutException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,8 +24,6 @@ import java.util.Map;
 public class UpstreamClient {
     /**
      * A component that has role of retrieving single response from upstream.
-     * it validates parameter and retrieve from upstream.
-     * When error occurs, it won't return Mono.error() because error result will also be aggregated by service.
      */
     @Value("${aggregationEndpoint}")
     private String aggregationEndpoint;
@@ -41,7 +36,16 @@ public class UpstreamClient {
         this.circuitBreakerRegistry = circuitBreakerRegistry;
     }
 
-//    @CircuitBreaker(name = "defaultCircuitBreaker")
+    /**
+     * it validates parameter and retrieve from upstream. <br>
+     * when error occurs, it won't return Mono.error() because error result will also be aggregated by service. <br>
+     * <b>TODO: this was difficult because I can't return Mono.error() in this method.
+     * We need to publish Mono.error() in order to invoke CB, then RE-GENERATE regular Mono.
+     * Now, I succeeded to do both (CB and aggregate) in case of only timeout. other error won't be caught by CB.</b>
+     * @param uriParamMap extracted single parameter for retrieving from upstream.
+     * @param headerMap extracted header.
+     * @return Mono that publish response. sometimes it's Exception object. <br>
+     */
     public Mono<Object> getResponse(JsonNode uriParamMap, Map<String, String> headerMap) {
         String shopId, manageNumber, xClientId, authorization;
         // parameter

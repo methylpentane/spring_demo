@@ -44,6 +44,11 @@ public class WebFluxSecurityConfig {
         return NoOpPasswordEncoder.getInstance();
     }
 
+    /**
+     * This Bean provides UserDetailsService that is reactive
+     * @param passwordEncoder passwordEncoder to use
+     * @return reactive UserDetailsService
+     */
     @Bean
     public MapReactiveUserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         Map<String, UserDetails> users = new HashMap<>();
@@ -62,6 +67,10 @@ public class WebFluxSecurityConfig {
         return new MapReactiveUserDetailsService(users);
     }
 
+    /**
+     * Bean that provides security filter chain
+     * @return Http filter chain
+     */
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http
@@ -73,17 +82,6 @@ public class WebFluxSecurityConfig {
                 .formLogin(withDefaults())
                 .csrf(ServerHttpSecurity.CsrfSpec::disable);
         return http.build();
-    }
-
-    @Bean
-    public WebExceptionHandler exceptionHandler() {
-        return (ServerWebExchange exchange, Throwable ex) -> {
-            if (ex instanceof InvalidRequestException) {
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                return exchange.getResponse().setComplete();
-            }
-            return Mono.error(ex);
-        };
     }
 
 }

@@ -10,9 +10,9 @@ public class BulkInterfaceMain {
 		SpringApplication.run(BulkInterfaceMain.class, args);
 	}
 	/*
-	test request:
+	test request example:
 
-	curl --location --request POST 'http://localhost:8080/bar' \
+	curl --location --request POST 'http://localhost:8080/' \
 	--header 'Content-Type: application/json' \
 	--header 'Authorization: Basic dXNlcjpwYXNzd29yZA==' \
 	--data-raw '{

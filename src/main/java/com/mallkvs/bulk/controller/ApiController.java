@@ -22,8 +22,14 @@ public class ApiController {
         this.aggregator = aggregator;
     }
 
+    /**
+     * main endpoint, also this intern's main goal
+     * @param rootNode request body that is provided as JSON.
+     * @param requestHeader request header.
+     * @return Mono of response entity to return.
+     */
     @RequestMapping(value = {"/"}, method = RequestMethod.POST, produces = "application/json")
-    public Mono<ResponseEntity<ObjectNode>> bar(@RequestBody JsonNode rootNode, @RequestHeader Map<String, String> requestHeader) {
+    public Mono<ResponseEntity<ObjectNode>> bulkInterface(@RequestBody JsonNode rootNode, @RequestHeader Map<String, String> requestHeader) {
         return aggregator.callAggregation(rootNode, requestHeader);
     }
 }

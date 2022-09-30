@@ -12,6 +12,11 @@ import java.util.Objects;
 
 @Log4j2
 public class ClientIdValidator implements WebFilter {
+    /**
+     * filter by validating if given request have "X-Client-Id" header <br>
+     * <b>TODO: handle exception from this filter.</b>
+     * @return delegated next filter.
+     */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         HttpHeaders headers = exchange.getRequest().getHeaders();

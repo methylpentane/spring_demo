@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * POJO that represents response from upstream.
+ */
 @Data
 @AllArgsConstructor
 public class Response {
-    /**
-     * POJO that deserialize response from upstream.
-     */
     private int httpStatus;
     private ObjectNode response;
 }

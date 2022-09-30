@@ -25,6 +25,9 @@ public class FileBasedSecurityConfigProvider {
 
     List<Object> securityUserConfig;
 
+    /**
+     * prepare List of Object(intended as JsonNode) Object for bean.
+     */
     @PostConstruct
     public void init() {
         ObjectMapper mapper = new ObjectMapper();
@@ -46,10 +49,18 @@ public class FileBasedSecurityConfigProvider {
         }
     }
 
+    /**
+     * bind object to Map and return
+     * @return bound map
+     */
     public Optional<Map<String, Object>> getConfiguration(){
         return Optional.of(Map.of("securityUserConfig", securityUserConfig));
     }
 
+    /**
+     * Bean that provide user database from JSON file (securityUserConfig)
+     * @return deserialized json object
+     */
     @Bean
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getUserConfigList() {

@@ -29,8 +29,13 @@ public class WebClientConfig {
         this.circuitBreakerConfig = circuitBreakerConfig;
     }
 
+    /**
+     * Bean that provides webclient <br>
+     * @return webclient bean
+     */
     @Bean
     public WebClient webClient() {
+        // TODO: externalize
         HttpClient client = HttpClient
             .create(ConnectionProvider
                           .builder("fixed")

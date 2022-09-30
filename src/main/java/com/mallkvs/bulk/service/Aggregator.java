@@ -28,8 +28,6 @@ import java.util.Map;
 public class Aggregator {
     /**
      * aggregator service of this server.
-     * validate request, send and collect each request from upstream.
-     * return aggregated result to client.
      */
     private final UpstreamClient upstreamClient;
     private final ObjectMapper mapper;
@@ -40,7 +38,12 @@ public class Aggregator {
         this.mapper = mapper;
     }
 
-//    @CircuitBreaker(name = "defaultCircuitBreaker")
+    /**
+     * send and collect each request from upstream, then aggregate to one response.
+     * @param requestBody JsonNode of request body, that should be composed of pairs of "shopId" and "manageNumber".
+     * @param requestHeader Map of request Header.
+     * @return aggregated result to client.
+     */
     public Mono<ResponseEntity<ObjectNode>> callAggregation(JsonNode requestBody, Map<String, String> requestHeader) {
 
         // extract requests for upstream

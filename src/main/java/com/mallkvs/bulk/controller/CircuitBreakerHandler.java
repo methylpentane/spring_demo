@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class CircuitBreakerHandler {
-    /**
-     * System will throw CallNotPermittedException, when server receive requests while CB is open.
-     * This ControllerAdvice provide an handling feature of the exception to controllers.
-     * It returns fallback response (503) when the exception is thrown.
-     */
     static final Logger logger = LogManager.getLogger(CircuitBreakerHandler.class.toString());
     static final String errorMessage = "Circuit Breaker is Open.";
+    /**
+     * It returns fallback response (503) when the exception is thrown. <br>
+     * exception is come from opened CB.
+     * @return 503 response that means opened CB.
+     */
     @ExceptionHandler({CallNotPermittedException.class})
     public ResponseEntity<String> handle(CallNotPermittedException e) {
         logger.error(errorMessage);
